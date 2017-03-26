@@ -10,9 +10,10 @@ namespace GameOfLife {
 
         internal void Start() {
             #region Setup matrix and 'glider' pattern
-            var matrix = new int[_gridSize, _gridSize]; // matix[25, 25]
+            var matrix = new int[_gridSize, _gridSize];
 
-            // Start with 'Glider' pattern placed in the middle of the 25x25 grid.
+            // Start with 'Glider' pattern placed in the middle of the 25x25 grid. 
+            // The rest of the cells are 0 (dead) by default
             matrix[11, 12] = 1;
             matrix[12, 13] = 1;
             matrix[13, 11] = 1;
@@ -34,13 +35,6 @@ namespace GameOfLife {
             }
         }
 
-        private void RunGeneration(int[,] matrix) {
-            foreach (var cell in _cells) {
-                cell.Evaluate();
-                matrix[cell.Coordinates.X, cell.Coordinates.Y] = cell.IsAlive ? 1 : 0;
-            }
-        }
-
         private void PrintGrid(int[,] matrix) {
             var builder = new StringBuilder();
 
@@ -57,6 +51,13 @@ namespace GameOfLife {
             Console.Write(builder);
         }
 
+        private void RunGeneration(int[,] matrix) {
+            foreach (var cell in _cells) {
+                cell.Evaluate();
+                matrix[cell.Coordinates.X, cell.Coordinates.Y] = cell.IsAlive ? 1 : 0;
+            }
+        }
+
         private void GenerateCells(int[,] matrix) {
             _cells = new List<Cell>();
 
@@ -66,7 +67,7 @@ namespace GameOfLife {
                     var cell = new Cell(isAlive: matrix[i, j] == 1);
                     cell.Coordinates = new Coordinates { X = i, Y = j };
 
-                    // Check 8 neighbour cells exist and are alive; then increment count of alive neighbours.
+                    // Check 8 neighbour cells exist, and for those alive increment count of alive neighbours.
 
                     cell.AliveNeighboursCount = (i - 1 >= 0 && j - 1 >= 0) && matrix[i - 1, j - 1] == 1
                         ? cell.AliveNeighboursCount + 1
