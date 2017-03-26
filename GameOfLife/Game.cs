@@ -12,22 +12,25 @@ namespace GameOfLife {
             #region Setup matrix and 'glider' pattern
             var matrix = new int[_gridSize, _gridSize]; // matix[25, 25]
 
-            // Glider pattern placed in the middle of the 25x25 grid.
-            matrix[12, 11] = 1;
-            matrix[13, 12] = 1;
-            matrix[11, 13] = 1;
+            // Start with 'Glider' pattern placed in the middle of the 25x25 grid.
+            matrix[11, 12] = 1;
             matrix[12, 13] = 1;
+            matrix[13, 11] = 1;
+            matrix[13, 12] = 1;
             matrix[13, 13] = 1;
             #endregion
 
-            GenerateCellsCollection(matrix);
+            GenerateCells(matrix);
             PrintGrid(matrix);
 
+            Console.Write("Press any key to start. ");
+            Console.ReadLine();
+
             while (true) {
-                Thread.Sleep(400);
-                GenerateCellsCollection(matrix);
+                GenerateCells(matrix);
                 RunGeneration(matrix);
                 PrintGrid(matrix);
+                Thread.Sleep(200);
             }
         }
 
@@ -42,7 +45,6 @@ namespace GameOfLife {
             var builder = new StringBuilder();
 
             Console.Clear();
-            Console.ResetColor();
             Console.ForegroundColor = ConsoleColor.DarkGreen;
 
             for (int i = 0; i < _gridSize; i++) {
@@ -55,17 +57,14 @@ namespace GameOfLife {
             Console.Write(builder);
         }
 
-        private void GenerateCellsCollection(int[,] matrix) {
+        private void GenerateCells(int[,] matrix) {
             _cells = new List<Cell>();
 
             for (int i = 0; i < _gridSize; i++) {
                 for (int j = 0; j < _gridSize; j++) {
-                    var cell = new Cell {
-                        Coordinates = new Coordinates { X = i, Y = j }
-                    };
 
-                    if (matrix[i, j] == 1)
-                        cell.Activate();
+                    var cell = new Cell(isAlive: matrix[i, j] == 1);
+                    cell.Coordinates = new Coordinates { X = i, Y = j };
 
                     // Check 8 neighbour cells exist and are alive; then increment count of alive neighbours.
 
@@ -114,6 +113,9 @@ namespace GameOfLife {
         public bool IsAlive { get; private set; }
         public Coordinates Coordinates { get; set; }
         public int AliveNeighboursCount { get; set; }
+        public Cell(bool isAlive) {
+            IsAlive = isAlive;
+        }
         public void Die() {
             IsAlive = false;
         }
